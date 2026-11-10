@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "Local Knowledge Companion",
+  "version": "1.1",
+  "description": "Asistente IA local con RAG, análisis de visión y gestión de documentos.",
+  "permissions": [
+    "storage",
+    "contextMenus",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "http://localhost:11434/*",
+    "http://127.0.0.1:11434/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html"
+  }
+}

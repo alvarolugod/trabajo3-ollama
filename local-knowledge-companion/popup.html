@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Local Knowledge Companion</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="header">
+    <h2>Local AI Companion</h2>
+    <span id="db-status">0 fragmentos</span>
+  </div>
+
+  <div class="section">
+    <label for="model-select">Modelo Ollama:</label>
+    <select id="model-select">
+      <option value="phi3">phi3</option>
+      <option value="llama3">llama3</option>
+      <option value="llava">llava (Multimodal / Visión)</option>
+      <option value="mistral">mistral</option>
+    </select>
+  </div>
+
+  <div class="section">
+    <h3>Cargar Documento (.txt / .md)</h3>
+    <input type="file" id="file-input" accept=".txt,.md">
+  </div>
+
+  <div class="section">
+    <h3>Captura de Pantalla</h3>
+    <button id="btn-screenshot" class="btn-secondary">📸 Analizar Pantalla Actual</button>
+  </div>
+
+  <div class="section">
+    <h3>Añadir Conocimiento Directo</h3>
+    <textarea id="note-input" placeholder="Escribe o pega texto para indexar..."></textarea>
+    <button id="btn-save">Indexar Texto</button>
+  </div>
+
+  <hr>
+
+  <div class="section">
+    <h3>Consulta RAG / Visión</h3>
+    <input type="text" id="query-input" placeholder="Haz una pregunta o describe la imagen...">
+    <button id="btn-ask">Preguntar</button>
+  </div>
+
+  <div id="rag-context" class="context-box hidden"></div>
+  <div id="chat-output" class="output-box">Haz una pregunta para empezar...</div>
+
+  <script src="vectorStore.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
