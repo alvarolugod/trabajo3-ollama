@@ -1,1 +1,0 @@
-# trabajo3-ollama
