@@ -1,0 +1,161 @@
+**Local Knowledge Companion** es una extensión para Google Chrome que convierte tu navegador en un asistente de Inteligencia Artificial local utilizando **Ollama**. Combina un flujo de **Retrieval-Augmented Generation (RAG)** para consultas sobre documentos/notas locales con capacidades **multimodales (Visión)** para análisis de capturas de pantalla, garantizando un procesamiento 100 % privado y sin dependencia de servicios en la nube.
+
+---
+
+##  Características Principales
+
+- ** Chat con LLMs Locales:** Conexión directa con modelos como `phi3`, `llama3`, `mistral` y `llava` ejecutados en tu propia máquina.
+- ** RAG y Vector Store Integrado:** Almacenamiento e indexación local de fragmentos mediante embeddings semánticos (`nomic-embed-text`) e identificación de contexto por **Similitud del Coseno**.
+- ** Análisis Multimodal (Visión):** Captura directa de la pestaña activa del navegador para enviar imágenes al modelo `llava` y realizar consultas visuales.
+- ** Gestión de Documentos:** Carga e indexación directa de archivos locales `.txt` y `.md`.
+- ** Captura Contextual:** Menú contextual (botón derecho) para guardar selecciones de texto navegando por la web directamente en la memoria vectorial.
+- ** Privacidad Total:** Todos los datos, imágenes y documentos permanecen en local. Sin llamadas a APIs externas ni uso de claves API.
+
+---
+
+##  Arquitectura Técnica
+
+                 ┌───────────────────────────┐
+                 │     Chrome Extension      │
+                 │ (Manifest V3 / JS Async) │
+                 └─────────────┬─────────────┘
+                               │
+     ┌─────────────────────────┼─────────────────────────┐
+     ▼                         ▼                         ▼
+┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐
+│ Context Menu /   │     │ Vector Store     │     │ Vision /         │
+│ File Upload      │     │ (chrome.storage) │     │ Screenshot API   │
+└────────┬─────────┘     └────────┬─────────┘     └────────┬─────────┘
+│                        │                        │
+│  Chunking &            │ Cosine                 │ Base64 Image
+│  Text Processing       │ Similarity             │ Data
+▼                        ▼                        ▼
+┌────────────────────────────────────────────────────────────────────┐
+│                       Ollama Engine (Localhost)                    │
+│   - Embeddings: nomic-embed-text                                   │
+│   - Text LLM: phi3 / llama3 / mistral                              │
+│   - Vision LLM: llava                                              │
+└────────────────────────────────────────────────────────────────────┘
+
+
+---
+
+##  Guía Paso a Paso de Instalación y Configuración
+
+Sigue estos pasos en detalle para poner en marcha la extensión en cualquier ordenador.
+
+### Paso 1: Obtener el Código Fuente del Proyecto
+
+1. Haz clic en el botón verde **`<Code>`** que se encuentra en la parte superior derecha de este repositorio en GitHub.
+2. Selecciona la opción **Download ZIP**.
+3. Una vez descargado, extrae el archivo comprimido en una carpeta de tu ordenador (por ejemplo, en el Escritorio).
+
+---
+
+### Paso 2: Instalación de Ollama y Descarga de Modelos
+
+Para que la extensión funcione, necesitas tener **Ollama** instalado y ejecutando los modelos necesarios en tu máquina local.
+
+1. **Instalar Ollama:**
+   - Descarga e instala la aplicación desde el sitio web oficial de Ollama.
+2. **Descargar los modelos necesarios desde la terminal:**
+   Abre PowerShell, CMD o tu terminal habitual y ejecuta los siguientes comandos uno por uno para descargar los pesos de los modelos:
+
+   ```bash
+   # Modelo especializado en generar vectores/embeddings semánticos (imprescindible para el RAG)
+   ollama pull nomic-embed-text
+
+   # Modelo principal para procesar respuestas de texto e instrucciones
+   ollama pull phi3
+
+   # (Opcional) Modelos alternativos de texto para seleccionar en la extensión
+   ollama pull llama3
+   ollama pull mistral
+
+   # Modelo multimodal con capacidad de procesamiento de imágenes
+   ollama pull llava
+Paso 3: Configurar e Iniciar Ollama con Permisos CORS
+Dado que las extensiones de Chrome realizan peticiones HTTP desde el navegador hacia la API local de Ollama (http://localhost:11434), es crucial iniciar el servicio permitiendo conexiones de origen cruzado (OLLAMA_ORIGINS).
+
+En Windows:
+Opción A (Ejecución rápida por terminal):
+Abre PowerShell y ejecuta:
+
+PowerShell
+$env:OLLAMA_ORIGINS="*"
+ollama serve
+(Deja esta ventana de terminal abierta mientras utilices la extensión).
+
+Opción B (Configuración permanente en el sistema - Recomendado):
+
+Presiona las teclas Windows + R, escribe sysdm.cpl y pulsa Enter.
+
+Ve a la pestaña Opciones avanzadas y haz clic en Variables de entorno...
+
+En la sección Variables de usuario, haz clic en Nueva...:
+
+Nombre de la variable: OLLAMA_ORIGINS
+
+Valor de la variable: *
+
+Guarda los cambios. A partir de este momento, Ollama permitirá conexiones desde el navegador automáticamente al iniciar el ordenador.
+
+En macOS o Linux:
+Abre tu terminal y ejecuta:
+
+Bash
+OLLAMA_ORIGINS="*" ollama serve
+Paso 4: Cargar la Extensión en Google Chrome
+Abre el navegador Google Chrome.
+
+Escribe chrome://extensions/ en la barra de direcciones y presiona Enter.
+
+En la esquina superior derecha de la pantalla, activa el interruptor de Modo de desarrollador.
+
+Aparecerá una nueva barra con botones. Haz clic en Cargar descomprimida (Load unpacked).
+
+En el explorador de archivos, busca y selecciona la carpeta extraída donde se encuentran los archivos del proyecto (manifest.json, popup.html, popup.js, etc.).
+
+¡Listo! Verás la extensión instalada y lista para usarse fijándola en la barra de herramientas de Chrome.
+
+ Guía de Uso
+Indexar conocimiento en la base vectorial:
+
+Navegación web: Selecciona cualquier texto en una página web, haz clic derecho y elige "Guardar texto en Memoria RAG".
+
+Archivos locales: Haz clic en Seleccionar archivo para importar y fragmentar documentos .txt o .md.
+
+Ingreso directo: Escribe o pega texto en la caja "Añadir Conocimiento Directo" y pulsa Indexar Texto.
+
+Consultas RAG:
+
+Escribe tu consulta en el campo de texto inferior.
+
+El algoritmo calculará la Similitud del Coseno y, si encuentra notas o documentos relevantes que superen el umbral estricto, aplicará el contexto recuperado para dar una respuesta precisa.
+
+Análisis de Pantalla con Visión:
+
+Abre la pestaña que deseas analizar.
+
+Haz clic en 📸 Analizar Pantalla Actual. La extensión capturará la ventana en formato de imagen y seleccionará automáticamente el modelo llava.
+
+Escribe una instrucción sobre el contenido visual (ej. "¿Qué resumen puedes hacer de esta imagen?") y pulsa Preguntar.
+
+ Estructura del Proyecto
+Plaintext
+local-knowledge-companion/
+├── manifest.json       # Configuración, permisos Manifest V3 y llamadas de red
+├── background.js       # Service worker para menú contextual y captura en segundo plano
+├── vectorStore.js      # Motor RAG: generación de embeddings, chunking y similitud del coseno
+├── popup.html          # Interfaz gráfica principal del panel
+├── popup.js            # Lógica de eventos, peticiones a la API de Ollama y capturas
+├── style.css           # Diseño UI en modo oscuro (Dark Theme)
+└── README.md           # Documentación completa del proyecto
+ Tecnologías Utilizadas
+Chrome Extensions API (Manifest V3, chrome.storage.local, chrome.contextMenus, chrome.tabs)
+
+Ollama API (/api/embeddings, /api/generate)
+
+JavaScript Async (ES6+)
+
+CSS3 (Variables CSS, Flexbox, Dark Theme UI)
